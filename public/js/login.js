@@ -1,9 +1,9 @@
 window.addEventListener('load', function() {
   
-  document.getElementById('siw-facebook').addEventListener('click', function(event) {
+  document.getElementById('siw-twitter').addEventListener('click', function(event) {
     event.preventDefault();
     
-    window.open('/login/federated/facebook', '_login', 'top=' + (screen.height / 2 - 275) + ',left=' + (screen.width / 2 - 250) + ',width=500,height=550');
+    window.open('/login/federated/twitter', '_login', 'top=' + (screen.height / 2 - 275) + ',left=' + (screen.width / 2 - 250) + ',width=500,height=550');
   });
   
   window.addEventListener('message', function(event) {
