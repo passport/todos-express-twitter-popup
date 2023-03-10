@@ -1,3 +1,12 @@
+function stringifyQuery(queryObj) {
+  var query = '';
+  for (var key in queryObj) {
+    if (query != '') { query += '&'; }
+    query += encodeURIComponent(key) + "=" + encodeURIComponent(queryObj[key]);
+  }
+  return query;
+}
+
 window.addEventListener('load', function() {
   
   document.getElementById('siw-twitter').addEventListener('click', function(event) {
@@ -14,14 +23,12 @@ window.addEventListener('load', function() {
     
     var csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
     var xhr = new XMLHttpRequest();
-    xhr.open('POST', '/oauth2/receive/facebook', true);
-    xhr.setRequestHeader('Content-Type', 'application/json');
-    xhr.setRequestHeader('CSRF-Token', csrfToken);
+    xhr.open('GET', '/oauth/receive/twitter?' + stringifyQuery(event.data.response), true);
     xhr.onload = function() {
       var json = JSON.parse(xhr.responseText);
       window.location.href = json.location;
     };
-    xhr.send(JSON.stringify(event.data.response));
+    xhr.send();
   });
   
 });

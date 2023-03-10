@@ -68,13 +68,10 @@ router.get('/login', function(req, res, next) {
 router.get('/login/federated/twitter', passport.authenticate('twitter'));
 
 router.get('/oauth/callback/twitter', function(req, res, next) {
-  console.log(req.query);
-  return;
-  
   res.render('redirect');
 });
 
-router.post('/oauth2/receive/twitter', passport.authenticate('twitter', {
+router.get('/oauth/receive/twitter', passport.authenticate('twitter', {
   failWithError: true
 }), function(req, res, next) {
   res.json({ ok: true, location: '/' });
