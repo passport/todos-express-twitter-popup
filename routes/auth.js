@@ -7,11 +7,9 @@ var db = require('../db');
 passport.use(new TwitterStrategy({
   consumerKey: process.env['TWITTER_CONSUMER_KEY'],
   consumerSecret: process.env['TWITTER_CONSUMER_SECRET'],
-  callbackURL: '/oauth/callback/twitter'
+  callbackURL: '/oauth/callback/twitter',
+  store: true
 }, function verify(token, tokenSecret, profile, cb) {
-  console.log('TWITTER AUTH');
-  console.log(profile);
-  
   db.get('SELECT * FROM federated_credentials WHERE provider = ? AND subject = ?', [
     'https://twitter.com',
     profile.id
@@ -65,16 +63,29 @@ router.get('/login', function(req, res, next) {
   res.render('login');
 });
 
-router.get('/login/federated/twitter', passport.authenticate('twitter'));
-
-router.get('/oauth/callback/twitter', function(req, res, next) {
-  res.render('redirect');
+router.get('/login/federated/twitter', function(req, res, next) {
+  var state = {
+    display: req.query.display || 'page'
+  };
+  passport.authenticate('twitter', { state: state })(req, res, next);
 });
 
-router.get('/oauth/receive/twitter', passport.authenticate('twitter', {
+router.get('/oauth/callback/twitter', passport.authenticate('twitter', {
   failWithError: true
 }), function(req, res, next) {
-  res.json({ ok: true, location: '/' });
+  var url = '/';
+  if (req.session && req.session.returnTo) {
+    url = req.session.returnTo;
+    delete req.session.returnTo;
+  }
+  var state = req.authInfo.state;
+  switch (state.display) {
+  case 'popup':
+    return res.render('redirect', { returnTo: url });
+  case 'page':
+  default:
+    return res.redirect(url);
+  }
 });
 
 router.post('/logout', function(req, res, next) {
